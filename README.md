@@ -2,6 +2,8 @@
  RESTfullAPI
 
 В теле HTTP POST-запроса передается путь к файлу в формает JSON: {"file_path": "C:/../test-app/TraineeTest/src/main/resources/static/10m.txt"}
+
+
 Ответы приходят в формате JSON/XML
 
 POST-запросы:
