@@ -69,6 +69,7 @@ public class FileController {
     }
 
     @PostMapping(value = "/get_all_values", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation("Получение всех значений c кэшированием результата")
     public ResponseEntity<AllValuesDTO> getAllValuesDTO(@RequestBody PathObject pathObject){
         return new ResponseEntity<>(fileService.getAllValuesDTO(pathObject), HttpStatus.OK);
     }
