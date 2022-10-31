@@ -2,8 +2,10 @@ package ru.derevenskikh.TraineeTest.services;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.derevenskikh.TraineeTest.dao.FileDAO;
+import ru.derevenskikh.TraineeTest.dto.AllValuesDTO;
 import ru.derevenskikh.TraineeTest.utils.NoSequenceException;
 import ru.derevenskikh.TraineeTest.utils.PathObject;
 
@@ -12,15 +14,17 @@ import java.util.*;
 @Service
 public class FileService {
     private final FileDAO fileDAO;
+    private final AllValuesDTO allValuesDTO;
+    private String checkSum;
 
     @Autowired
-    public FileService(FileDAO fileDAO) {
+    public FileService(FileDAO fileDAO, AllValuesDTO allValuesDTO) {
         this.fileDAO = fileDAO;
+        this.allValuesDTO = allValuesDTO;
     }
 
-    @SneakyThrows
-    public int getMaxValue(PathObject pathObject) {
-        return Integer.parseInt(Collections.max(new ArrayList(fileDAO.getListOfIntegers(pathObject.getFilePath()))).toString());
+    public int getMaxValue(String path) {
+        return Integer.parseInt(Collections.max(new ArrayList(fileDAO.getListOfIntegers(path))).toString());
     }
 
     public int getMinValue(String path) {
@@ -85,5 +89,18 @@ public class FileService {
             resultSequences.add(list);
         }
         return resultSequences;
+    }
+
+    @SneakyThrows
+    @Cacheable(value = "allValues", key = "#pathObject.getCheckSum()")
+    public AllValuesDTO getAllValuesDTO(PathObject pathObject){
+        Thread.sleep(2000); //проверка работы кэширования
+        if(checkSum == null){
+            checkSum = pathObject.getCheckSum();
+        }
+        if(!checkSum.equals(pathObject.getCheckSum())){
+            allValuesDTO.dropValues();
+        }
+        return allValuesDTO;
     }
 }
